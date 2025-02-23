@@ -30,12 +30,11 @@ internal class Program
 
     private static void GeneratePoolRewardsCSV(int taxYear)
     {
-        string[] excludeSenders = {
-            "", 
-        };
+        var ExcludedFromConfigSettings = GetConfigSettings<string[]>("ExcludedPoolRewardWinSenders").ToString();
+        string[] excludeSenders = { ExcludedFromConfigSettings };
 
-        var historicalDailyPrices = GetHistoricalPrice<HistoricalDaily>("Select [Date], [Open],[High], [Low] From HistoricalDaily" + taxYear);
-        var transactions = GetHistoricalPrice<Transactions>("Select [data__in__xch__coinfirmed_time], [data__in__xch__sender__address], [data__in__xch__amount] From Transactions");
+        var historicalDailyPrices = Query<HistoricalDaily>("Select [Date], [Open],[High], [Low] From HistoricalDaily" + taxYear);
+        var transactions = Query<Transactions>("Select [data__in__xch__coinfirmed_time], [data__in__xch__sender__address], [data__in__xch__amount] From Transactions");
 
         var walletTransactions = from transaction in transactions
                                  join historicalPrice in historicalDailyPrices
@@ -59,10 +58,11 @@ internal class Program
 
     private static void GenerateBlockWinsCSV(int taxYear)
     {
-        string[] excludeSenders = { "" };
+        var ExcludedFromConfigSettings = GetConfigSettings<string[]>("ExcludedBlockWinSenders").ToString();
+        string[] excludeSenders = { ExcludedFromConfigSettings };
 
-        var historicalDailyPrices = GetHistoricalPrice<HistoricalDaily>("Select [Date], [Open],[High], [Low] From HistoricalDaily" + taxYear);
-        var transactionsBlockWins = GetHistoricalPrice<BlockWins>("Select coinfirmed_time, amount From TransactionsBlockWins");
+        var historicalDailyPrices = Query<HistoricalDaily>("Select [Date], [Open],[High], [Low] From HistoricalDaily" + taxYear);
+        var transactionsBlockWins = Query<BlockWins>("Select coinfirmed_time, amount From TransactionsBlockWins");
 
         var walletTransactions = from transaction in transactionsBlockWins
                                  join historicalPrice in historicalDailyPrices
@@ -83,7 +83,7 @@ internal class Program
         }
     }
 
-    private static List<T> GetHistoricalPrice<T>(string sql)
+    private static List<T> Query<T>(string sql)
     {
         IConfigurationBuilder builder = new ConfigurationBuilder().AddJsonFile("appsettings.json", false, true);
         IConfigurationRoot root = builder.Build();
@@ -94,5 +94,15 @@ internal class Program
         {
             return connection.Query<T>(sql).ToList();
         }
+    }
+
+    private static string[] GetConfigSettings<T>(string name)
+    {
+        IConfigurationBuilder builder = new ConfigurationBuilder().AddJsonFile("appsettings.json", false, true);
+        IConfigurationRoot root = builder.Build();
+
+        var settings = root.GetSection(name).Get<string[]>();
+
+        return settings;
     }
 }
