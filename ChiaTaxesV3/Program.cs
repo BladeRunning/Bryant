@@ -101,8 +101,6 @@ internal class Program
         IConfigurationBuilder builder = new ConfigurationBuilder().AddJsonFile("appsettings.json", false, true);
         IConfigurationRoot root = builder.Build();
 
-        var settings = root.GetSection(name).Get<string[]>();
-
-        return settings;
+        return root.GetSection(name).Get<string[]>();
     }
 }
