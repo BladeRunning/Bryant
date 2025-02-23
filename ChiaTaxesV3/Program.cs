@@ -18,21 +18,21 @@ internal class Program
 {
     static void Main()
     {
-        var convertOutput = new ConvertOutput();
-        convertOutput.FileToCSV("transactions_output.txt", "output2024.csv");
+        // headers in output
+        Console.WriteLine("Historical Date,Transaction Date,XCH Amount,Price Avg,Revenue");
 
-       // Console.WriteLine("Historical Date,Transaction Date,XCH Amount,Price Avg,Revenue");
+        GenerateBlockWinsCSV(2024);
 
-        // GenerateBlockWinsCSV(2024);
+        Console.WriteLine("");
 
-        // Console.WriteLine("");
-
-        // GeneratePoolRewardsCSV(2024);
+        GeneratePoolRewardsCSV(2024);
     }
 
     private static void GeneratePoolRewardsCSV(int taxYear)
     {
-        string[] excludeSenders = {""};
+        string[] excludeSenders = {
+            "", 
+        };
 
         var historicalDailyPrices = GetHistoricalPrice<HistoricalDaily>("Select [Date], [Open],[High], [Low] From HistoricalDaily" + taxYear);
         var transactions = GetHistoricalPrice<Transactions>("Select [data__in__xch__coinfirmed_time], [data__in__xch__sender__address], [data__in__xch__amount] From Transactions");
@@ -59,7 +59,7 @@ internal class Program
 
     private static void GenerateBlockWinsCSV(int taxYear)
     {
-        string[] excludeSenders = {""};
+        string[] excludeSenders = { "" };
 
         var historicalDailyPrices = GetHistoricalPrice<HistoricalDaily>("Select [Date], [Open],[High], [Low] From HistoricalDaily" + taxYear);
         var transactionsBlockWins = GetHistoricalPrice<BlockWins>("Select coinfirmed_time, amount From TransactionsBlockWins");
