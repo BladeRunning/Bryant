@@ -30,8 +30,8 @@ internal class Program
 
     private static void GeneratePoolRewardsCSV(int taxYear)
     {
-        var ExcludedFromConfigSettings = GetConfigSettings<string[]>("ExcludedPoolRewardWinSenders").ToString();
-        string[] excludeSenders = { ExcludedFromConfigSettings };
+        var ExcludedFromConfigSettings = GetConfigSettings<string[]>("ExcludedPoolRewardWinSenders");
+        string[] excludeSenders = ExcludedFromConfigSettings;
 
         var historicalDailyPrices = Query<HistoricalDaily>("Select [Date], [Open],[High], [Low] From HistoricalDaily" + taxYear);
         var transactions = Query<Transactions>("Select [data__in__xch__coinfirmed_time], [data__in__xch__sender__address], [data__in__xch__amount] From Transactions");
@@ -58,8 +58,8 @@ internal class Program
 
     private static void GenerateBlockWinsCSV(int taxYear)
     {
-        var ExcludedFromConfigSettings = GetConfigSettings<string[]>("ExcludedBlockWinSenders").ToString();
-        string[] excludeSenders = { ExcludedFromConfigSettings };
+        var ExcludedFromConfigSettings = GetConfigSettings<string[]>("ExcludedBlockWinSenders");
+        string[] excludeSenders = ExcludedFromConfigSettings;
 
         var historicalDailyPrices = Query<HistoricalDaily>("Select [Date], [Open],[High], [Low] From HistoricalDaily" + taxYear);
         var transactionsBlockWins = Query<BlockWins>("Select coinfirmed_time, amount From TransactionsBlockWins");
