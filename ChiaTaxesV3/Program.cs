@@ -18,14 +18,65 @@ internal class Program
 {
     static void Main()
     {
+        GenerateSellProfitLossCSVFile();
+
+        //GenerateTransactionsOutput(2024);
+    }
+
+    private static void GenerateTransactionsOutput(int year)
+    {
         // headers in output
         Console.WriteLine("Historical Date,Transaction Date,XCH Amount,Price Avg,Revenue");
 
-        GenerateBlockWinsCSV(2024);
+        GenerateBlockWinsCSV(year);
 
         Console.WriteLine("");
 
-        GeneratePoolRewardsCSV(2024);
+        GeneratePoolRewardsCSV(year);
+    }
+
+    /// <summary>
+    /// Displays the cost basis of each mining and block win transactions excluding transfers from internal wallets.
+    /// </summary>
+    private static void GenerateSellProfitLossCSVFile()
+    {
+        var ExcludedFromConfigSettings = GetConfigSettings<string[]>("ExcludedPoolRewardWinSenders");
+        string[] excludeSenders = ExcludedFromConfigSettings;
+
+        // historical price data is in separate tables by year
+        var historicalDailyPrices = Query<HistoricalDaily>("SELECT [Date], [Open], [High], [Low]\r\nFROM HistoricalDaily2022\r\nUNION ALL\r\nSELECT [Date], [Open], [High], [Low]\r\nFROM HistoricalDaily2023\r\nUNION ALL\r\nSELECT [Date], [Open], [High], [Low]\r\nFROM HistoricalDaily2024\r\nORDER BY [Date]");
+
+        var transactions = Query<Transactions>("Select [data__in__xch__coinfirmed_time], [data__in__xch__sender__address], [data__in__xch__amount] From Transactions");
+        var walletTransactions = from transaction in transactions
+                                 join historicalPrice in historicalDailyPrices
+                                 on transaction.data__in__xch__coinfirmed_time.Date equals historicalPrice.Date
+                                 where !excludeSenders.Contains(transaction.data__in__xch__sender__address)
+                                 orderby transaction.data__in__xch__coinfirmed_time.Date
+                                 select new
+                                 {
+                                     HistoricalDate = historicalPrice.Date.ToString("MM/dd/yyyy"),
+                                     TransactionDate = transaction.data__in__xch__coinfirmed_time,
+                                     PriceAvg = (historicalPrice.Low + historicalPrice.High) / 2,
+                                     XCHAmount = transaction.data__in__xch__amount,
+                                 };
+
+        string filePath = "transaction history.csv";
+        using (StreamWriter writer = new StreamWriter(filePath, true))
+        {
+            bool fileExists = File.Exists(filePath);
+
+            if (!fileExists)
+            {
+                writer.WriteLine("HistoricalDate,TransactionDate,XCHAmount,PriceAvg,TotalValue");
+            }
+
+            foreach (var transaction in walletTransactions)
+            {
+                writer.WriteLine($"{transaction.HistoricalDate},{transaction.TransactionDate},{transaction.XCHAmount},{transaction.PriceAvg},{transaction.PriceAvg * transaction.XCHAmount}");
+            }
+        }
+
+        Console.WriteLine($"Data written to {filePath}");
     }
 
     private static void GeneratePoolRewardsCSV(int taxYear)
