@@ -63,12 +63,7 @@ internal class Program
         string filePath = "transaction history.csv";
         using (StreamWriter writer = new StreamWriter(filePath, true))
         {
-            bool fileExists = File.Exists(filePath);
-
-            if (!fileExists)
-            {
-                writer.WriteLine("HistoricalDate,TransactionDate,XCHAmount,PriceAvg,TotalValue");
-            }
+            writer.WriteLine("HistoricalDate,TransactionDate,XCHAmount,PriceAvg,TotalValue");
 
             foreach (var transaction in walletTransactions)
             {
