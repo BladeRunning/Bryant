@@ -1,6 +1,6 @@
 ﻿namespace ChiaTaxes;
 
-public class Transactions
+public class AllTransactions
 {
     public DateTime confirmed_time { get; set; }
 
