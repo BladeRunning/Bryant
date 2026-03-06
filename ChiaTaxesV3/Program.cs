@@ -28,7 +28,7 @@ internal class Program
         //GenerateSellProfitLoss();
 
         QuestPDF.Settings.License = LicenseType.Community;
-        var rows = Get8949CsvRows.ConvertCsvTo8949("long term profit loss 8949.csv");
+        var rows = Get8949CsvRows.ConvertCsvTo8949("long term profit loss.csv");
         var outputPath = "Form8949Generator/test output 8949 long term.pdf";
         var templatePath = "Form8949Generator/f8949.pdf";
 
