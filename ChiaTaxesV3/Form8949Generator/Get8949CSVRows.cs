@@ -21,13 +21,10 @@ public class Get8949CsvRows
         using var reader = new StreamReader(csvPath, Encoding.UTF8, detectEncodingFromByteOrderMarks: true);
         using var csv = new CsvReader(reader, config);
 
-        // REQUIRED — read first line
         if (!csv.Read())
             throw new Exception("CSV is empty or unreadable.");
 
-        // REQUIRED — read header row
         csv.ReadHeader();
-
         var rows = new List<Form8949Row>();
 
         while (csv.Read())
@@ -38,6 +35,8 @@ public class Get8949CsvRows
                 DateAcquired = csv.GetField<DateTime>("acquired"),
                 DateSold = csv.GetField<DateTime>("sold"),
                 Proceeds = csv.GetField<decimal>("proceeds"),
+                Codes = csv.GetField("codes"),
+                Adjustment = csv.GetField<decimal>("adjustment"),
                 CostBasis = csv.GetField<decimal>("costbasis"),
                 GainOrLoss = csv.GetField<decimal>("gainloss")
             };

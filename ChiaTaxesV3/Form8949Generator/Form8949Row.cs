@@ -12,9 +12,9 @@
 
         public decimal CostBasis { get; set; }
 
-        public string Codes { get; set; }
+        public string? Codes { get; set; }
 
-        public string Adjustment { get; set; }
+        public decimal? Adjustment { get; set; }
 
         public decimal GainOrLoss { get; set; }
     }

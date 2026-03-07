@@ -1,10 +1,7 @@
-using ChiaTaxesV3;
 using ChiaTaxesV3.Form8949Generator;
 using Dapper;
 using Microsoft.Data.SqlClient;
-using QuestPDF.Fluent;
 using QuestPDF.Infrastructure;
-using System.Runtime.CompilerServices;
 
 namespace ChiaTaxes;
 
@@ -29,7 +26,7 @@ internal class Program
 
         QuestPDF.Settings.License = LicenseType.Community;
         var rows = Get8949CsvRows.ConvertCsvTo8949("Form8949Generator/long term profit loss.csv");
-        var outputPath = "Form8949Generator/test output 8949 long term.pdf";
+        var outputPath = "Form8949Generator/output 8949 long term.pdf";
         var templatePath = "Form8949Generator/f8949.pdf";
 
         // generate 8949 pdf from csv
