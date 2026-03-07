@@ -33,21 +33,6 @@ public class Form8949Generator
             // Start a new page when needed
             if (index % rowsPerPage == 0)
             {
-                // If this is not the first page, draw totals for the previous page
-                //if (index > 0)
-                //{
-                //    gfx.DrawString(proceedsTotal.ToString("F2", CultureInfo.InvariantCulture), font, XBrushes.Black, new XPoint(280, 655));
-                //    gfx.DrawString(costBasisTotal.ToString("F2", CultureInfo.InvariantCulture), font, XBrushes.Black, new XPoint(345, 655));
-                //    gfx.DrawString(adjustmentTotal.ToString("F2", CultureInfo.InvariantCulture), font, XBrushes.Black, new XPoint(455, 655));
-                //    gfx.DrawString(gainOrLossTotal.ToString("F2", CultureInfo.InvariantCulture), font, XBrushes.Black, new XPoint(520, 655));
-                //}
-
-                // Reset totals for the new page
-                proceedsTotal = 0;
-                costBasisTotal = 0;
-                adjustmentTotal = 0;
-                gainOrLossTotal = 0;
-
                 // Create new page
                 var newPage = outputDoc.AddPage(templatePage);
                 gfx = XGraphics.FromPdfPage(newPage);
@@ -80,19 +65,19 @@ public class Form8949Generator
             var roundedAdjustment = row.Adjustment?.ToString("F2", CultureInfo.InvariantCulture);
             var roundedGainLoss = row.GainOrLoss.ToString("F2", CultureInfo.InvariantCulture);
 
-            // Draw rounded values
+            // Draw rounded values for row
             gfx.DrawString(roundedProceeds, font, XBrushes.Black, new XPoint(280, y));
             gfx.DrawString(roundedCostBasis, font, XBrushes.Black, new XPoint(345, y));
             gfx.DrawString(roundedAdjustment, font, XBrushes.Black, new XPoint(455, y));
             gfx.DrawString(roundedGainLoss, font, XBrushes.Black, new XPoint(520, y));
 
-            // Add to per‑page totals
+            // Add to totals
             proceedsTotal += decimal.Parse(roundedProceeds, CultureInfo.InvariantCulture);
             costBasisTotal += decimal.Parse(roundedCostBasis, CultureInfo.InvariantCulture);
             adjustmentTotal += decimal.Parse(roundedAdjustment, CultureInfo.InvariantCulture);
             gainOrLossTotal += decimal.Parse(roundedGainLoss, CultureInfo.InvariantCulture);
 
-            // Draw totals on the last page
+            // Draw totals on the footer of page
             if (index == rows.Count - 1)
             {
                 gfx.DrawString(proceedsTotal.ToString("F2", CultureInfo.InvariantCulture), font, XBrushes.Black, new XPoint(280, 655));
