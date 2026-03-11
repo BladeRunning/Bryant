@@ -50,9 +50,10 @@ public class Form8949Generator
             }
 
             double y = startY + (index % rowsPerPage) * rowHeight + shortTermOffset;
+            var descriptionXPos = isShortTerm ? 10: 40;
 
             // Draw row text
-            gfx.DrawString(row.Description, font, XBrushes.Black, new XPoint(10 + shortTermOffset, y));
+            gfx.DrawString(row.Description, font, XBrushes.Black, new XPoint(descriptionXPos, y));
             gfx.DrawString(row.DateAcquired.ToShortDateString(), font, XBrushes.Black, new XPoint(175, y));
             gfx.DrawString(row.DateSold.ToShortDateString(), font, XBrushes.Black, new XPoint(225, y));
             gfx.DrawString(row.Codes, font, XBrushes.Black, new XPoint(410, y));
