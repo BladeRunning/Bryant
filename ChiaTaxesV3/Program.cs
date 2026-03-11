@@ -26,7 +26,7 @@ internal class Program
 
         QuestPDF.Settings.License = LicenseType.Community;
         var rows = Get8949CsvRows.ConvertCsvTo8949("Form8949Generator/profit loss.csv");
-        var outputPath = "Form8949Generator/8949 term.pdf";
+        var outputPath = "Form8949Generator/8949 output.pdf";
         var templatePath = "Form8949Generator/f8949.pdf";
 
         // generate 8949 pdf from csv
