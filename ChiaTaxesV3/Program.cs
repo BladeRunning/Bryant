@@ -25,12 +25,12 @@ internal class Program
         //GenerateSellProfitLoss();
 
         QuestPDF.Settings.License = LicenseType.Community;
-        var rows = Get8949CsvRows.ConvertCsvTo8949("Form8949Generator/long term profit loss.csv");
-        var outputPath = "Form8949Generator/output 8949 long term.pdf";
+        var rows = Get8949CsvRows.ConvertCsvTo8949("Form8949Generator/profit loss.csv");
+        var outputPath = "Form8949Generator/8949 term.pdf";
         var templatePath = "Form8949Generator/f8949.pdf";
 
         // generate 8949 pdf from csv
-        Form8949Generator.Create(false, templatePath, outputPath, rows);
+        Form8949Generator.Create(true, templatePath, outputPath, rows);
     }
 
     private static void GenerateSellProfitLoss()

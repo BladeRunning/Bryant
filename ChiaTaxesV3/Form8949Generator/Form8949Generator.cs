@@ -11,6 +11,7 @@ public class Form8949Generator
     {
         var templateDoc = PdfReader.Open(templatePath, PdfDocumentOpenMode.Import);
         var page = isShortTerm ? 0 : 1;
+        var shortTermOffset = isShortTerm ? 35 : 0;
         var templatePage = templateDoc.Pages[page];
 
         var outputDoc = new PdfDocument();
@@ -37,24 +38,21 @@ public class Form8949Generator
                 var newPage = outputDoc.AddPage(templatePage);
                 gfx = XGraphics.FromPdfPage(newPage);
 
-                // Draw x in box at top of form - long-term transactions reported on 1099-B or 1099-DA etc
+                // Draw x in box at top of form for long or short term types
                 // One option is used
-                //const int boxDPos = 225;
-                //const int boxEPos = 237;
-                //const int boxFPos = 249;
-                //const int boxJPos = 261;
-                //const int boxKPos = 274;
-                const int boxLPos = 285;
+                //short-term box -
+                const int boxPos = 321;
+                //long-term box - const int boxPos = 285;
 
                 // Draw X in box
                 var xFont = new XFont("Arial", 13);
-                gfx.DrawString("x", xFont, XBrushes.Black, new XPoint(51, boxLPos));
+                gfx.DrawString("x", xFont, XBrushes.Black, new XPoint(51, boxPos));
             }
 
-            double y = startY + (index % rowsPerPage) * rowHeight;
+            double y = startY + (index % rowsPerPage) * rowHeight + shortTermOffset;
 
             // Draw row text
-            gfx.DrawString(row.Description, font, XBrushes.Black, new XPoint(40, y));
+            gfx.DrawString(row.Description, font, XBrushes.Black, new XPoint(10 + shortTermOffset, y));
             gfx.DrawString(row.DateAcquired.ToShortDateString(), font, XBrushes.Black, new XPoint(175, y));
             gfx.DrawString(row.DateSold.ToShortDateString(), font, XBrushes.Black, new XPoint(225, y));
             gfx.DrawString(row.Codes, font, XBrushes.Black, new XPoint(410, y));
@@ -68,13 +66,18 @@ public class Form8949Generator
             // Draw rounded values for row
             gfx.DrawString(roundedProceeds, font, XBrushes.Black, new XPoint(280, y));
             gfx.DrawString(roundedCostBasis, font, XBrushes.Black, new XPoint(345, y));
-            gfx.DrawString(roundedAdjustment, font, XBrushes.Black, new XPoint(455, y));
+
+            if (roundedAdjustment != null)
+            {
+                gfx.DrawString(roundedAdjustment, font, XBrushes.Black, new XPoint(455, y));
+                adjustmentTotal += decimal.Parse(roundedAdjustment, CultureInfo.InvariantCulture);
+            }
+
             gfx.DrawString(roundedGainLoss, font, XBrushes.Black, new XPoint(520, y));
 
             // Add to totals
             proceedsTotal += decimal.Parse(roundedProceeds, CultureInfo.InvariantCulture);
             costBasisTotal += decimal.Parse(roundedCostBasis, CultureInfo.InvariantCulture);
-            adjustmentTotal += decimal.Parse(roundedAdjustment, CultureInfo.InvariantCulture);
             gainOrLossTotal += decimal.Parse(roundedGainLoss, CultureInfo.InvariantCulture);
 
             // Draw totals on the footer of page

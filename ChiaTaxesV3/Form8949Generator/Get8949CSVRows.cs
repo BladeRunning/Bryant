@@ -35,8 +35,8 @@ public class Get8949CsvRows
                 DateAcquired = csv.GetField<DateTime>("acquired"),
                 DateSold = csv.GetField<DateTime>("sold"),
                 Proceeds = csv.GetField<decimal>("proceeds"),
-                Codes = csv.GetField("codes"),
-                Adjustment = csv.GetField<decimal>("adjustment"),
+                Codes = csv.GetField("codes") ?? "",
+                Adjustment = csv.GetField<decimal?>("adjustment"),
                 CostBasis = csv.GetField<decimal>("costbasis"),
                 GainOrLoss = csv.GetField<decimal>("gainloss")
             };
