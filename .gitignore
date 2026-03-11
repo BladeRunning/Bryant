@@ -1,5 +1,8 @@
 ﻿################################################################################
 # This .gitignore file was automatically created by Microsoft(R) Visual Studio.
 ################################################################################
-
-/ChiaTaxesV3/long term profit loss 8949.csv
+*.csv
+*.vs
+*bin
+*obj
+/ChiaTaxesV3/Form8949Generator/8949 term.pdf

@@ -40,9 +40,9 @@ public class Form8949Generator
 
                 // Draw x in box at top of form for long or short term types
                 // One option is used
-                //short-term box -
-                const int boxPos = 321;
-                //long-term box - const int boxPos = 285;
+                //short-term box L - const int boxPos = 321;
+                //long-term box L -
+                const int boxPos = 285;
 
                 // Draw X in box
                 var xFont = new XFont("Arial", 13);
