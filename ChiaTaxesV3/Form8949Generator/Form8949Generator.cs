@@ -1,7 +1,7 @@
-﻿using PdfSharpCore.Pdf;
-using PdfSharpCore.Pdf.IO;
+﻿using PdfSharpCore.Pdf.IO;
 using PdfSharpCore.Drawing;
 using System.Globalization;
+using PdfSharpCore.Pdf;
 
 namespace ChiaTaxesV3.Form8949Generator;
 
@@ -11,7 +11,8 @@ public class Form8949Generator
     {
         var templateDoc = PdfReader.Open(templatePath, PdfDocumentOpenMode.Import);
         var page = isShortTerm ? 0 : 1;
-        var shortTermOffset = isShortTerm ? 35 : 0;
+        var shortTermRowOffset = isShortTerm ? 35 : 0;
+        var yShortTermTotalOffset = isShortTerm ? 35 : 0;
         var templatePage = templateDoc.Pages[page];
 
         var outputDoc = new PdfDocument();
@@ -29,28 +30,40 @@ public class Form8949Generator
         int index = 0;
         XGraphics gfx = null;
 
+        // Box position (you had long-term hardcoded)
+        int boxPos = isShortTerm ? 321 : 285;
+
         foreach (var row in rows)
         {
             // Start a new page when needed
             if (index % rowsPerPage == 0)
             {
+                // If this is NOT the first page, draw totals for the previous page
+                if (index > 0)
+                {
+                    gfx.DrawString(proceedsTotal.ToString("F2"), font, XBrushes.Black, new XPoint(280, 640 + yShortTermTotalOffset));
+                    gfx.DrawString(costBasisTotal.ToString("F2"), font, XBrushes.Black, new XPoint(345, 640 + yShortTermTotalOffset));
+                    gfx.DrawString(adjustmentTotal.ToString("F2"), font, XBrushes.Black, new XPoint(455, 640 + yShortTermTotalOffset));
+                    gfx.DrawString(gainOrLossTotal.ToString("F2"), font, XBrushes.Black, new XPoint(520, 640 + yShortTermTotalOffset));
+                }
+
+                // Reset totals for the new page
+                proceedsTotal = 0;
+                costBasisTotal = 0;
+                adjustmentTotal = 0;
+                gainOrLossTotal = 0;
+
                 // Create new page
                 var newPage = outputDoc.AddPage(templatePage);
                 gfx = XGraphics.FromPdfPage(newPage);
-
-                // Draw x in box at top of form for long or short term types
-                // One option is used
-                //short-term box L - const int boxPos = 321;
-                //long-term box L -
-                const int boxPos = 285;
 
                 // Draw X in box
                 var xFont = new XFont("Arial", 13);
                 gfx.DrawString("x", xFont, XBrushes.Black, new XPoint(51, boxPos));
             }
 
-            double y = startY + (index % rowsPerPage) * rowHeight + shortTermOffset;
-            var descriptionXPos = isShortTerm ? 10: 40;
+            double y = startY + (index % rowsPerPage) * rowHeight + shortTermRowOffset;
+            var descriptionXPos = 40;
 
             // Draw row text
             gfx.DrawString(row.Description, font, XBrushes.Black, new XPoint(descriptionXPos, y));
@@ -81,17 +94,14 @@ public class Form8949Generator
             costBasisTotal += decimal.Parse(roundedCostBasis, CultureInfo.InvariantCulture);
             gainOrLossTotal += decimal.Parse(roundedGainLoss, CultureInfo.InvariantCulture);
 
-            // Draw totals on the footer of page
-            if (index == rows.Count - 1)
-            {
-                gfx.DrawString(proceedsTotal.ToString("F2", CultureInfo.InvariantCulture), font, XBrushes.Black, new XPoint(280, 655));
-                gfx.DrawString(costBasisTotal.ToString("F2", CultureInfo.InvariantCulture), font, XBrushes.Black, new XPoint(345, 655));
-                gfx.DrawString(adjustmentTotal.ToString("F2", CultureInfo.InvariantCulture), font, XBrushes.Black, new XPoint(455, 655));
-                gfx.DrawString(gainOrLossTotal.ToString("F2", CultureInfo.InvariantCulture), font, XBrushes.Black, new XPoint(520, 655));
-            }
-
             index++;
         }
+
+        // Draw totals for the final page
+        gfx.DrawString(proceedsTotal.ToString("F2"), font, XBrushes.Black, new XPoint(280, 640 + yShortTermTotalOffset));
+        gfx.DrawString(costBasisTotal.ToString("F2"), font, XBrushes.Black, new XPoint(345, 640 + yShortTermTotalOffset));
+        gfx.DrawString(adjustmentTotal.ToString("F2"), font, XBrushes.Black, new XPoint(455, 640 + yShortTermTotalOffset));
+        gfx.DrawString(gainOrLossTotal.ToString("F2"), font, XBrushes.Black, new XPoint(520, 640 + yShortTermTotalOffset));
 
         outputDoc.Save(outputPath);
     }
