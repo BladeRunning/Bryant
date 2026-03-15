@@ -115,7 +115,12 @@ internal class Program
         var results = new List<MatchedSellDetail>();
 
         // FIFO queue of remaining transaction / buy amounts - buys = payouts + block wins
-        var buyQueue = new Queue<(DateTime Date, decimal Amount, decimal Price)>(buys);
+        var buyQueue = new Queue<BuyLot>(buys.Select(b => new BuyLot
+        {
+            Date = b.Date,
+            Amount = b.Amount,
+            Price = b.Price
+        }));
 
         foreach (var sell in sells)
         {
@@ -137,14 +142,10 @@ internal class Program
                     XCHAmount = matched
                 });
 
-                // Reduce buy amount
-                var leftover = buy.Amount - matched;
-                buyQueue.Dequeue();
+                buy.Amount -= matched;
 
-                if (leftover > 0)
-                {
-                    buyQueue.Enqueue((buy.Date, leftover, buy.Price));
-                }
+                if (buy.Amount == 0)
+                    buyQueue.Dequeue();
 
                 remainingToMatch -= matched;
             }

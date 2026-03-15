@@ -1,5 +1,7 @@
-﻿public class MatchedSellDetail
-{
+﻿namespace ChiaTaxes;
+
+public class MatchedSellDetail 
+{ 
     public DateTime SellDate { get; set; }
 
     public decimal SellPrice { get; set; }

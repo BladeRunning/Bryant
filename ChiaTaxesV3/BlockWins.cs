@@ -1,10 +1,9 @@
-﻿namespace ChiaTaxes
+﻿namespace ChiaTaxes;
+
+public class BlockWins
 {
-    public class BlockWins
-    {
-        public DateTime coinfirmed_time { get; set; }
+    public DateTime coinfirmed_time { get; set; }
 
-        public Decimal amount { get; set; }
+    public Decimal amount { get; set; }
 
-    }
 }
