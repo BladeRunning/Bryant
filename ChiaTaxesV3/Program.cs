@@ -22,12 +22,12 @@ internal class Program
     {
         //GenerateTransactionsOutput(2025);
 
-        GenerateSellProfitLoss();
+        //GenerateSellProfitLoss();
 
-        //Generate8949();
+        Generate8949(isShortTerm: false);
     }
 
-    private static void Generate8949()
+    private static void Generate8949(bool isShortTerm)
     {
         QuestPDF.Settings.License = LicenseType.Community;
         var rows = Get8949CsvRows.ConvertCsvTo8949("Form8949Generator/profit loss.csv");
@@ -35,7 +35,7 @@ internal class Program
         var templatePath = "Form8949Generator/f8949.pdf";
 
         // generate 8949 pdf from csv
-        Form8949Generator.Create(isShortTerm: true, templatePath, outputPath, rows);
+        Form8949Generator.Create(isShortTerm, templatePath, outputPath, rows);
     }
 
     private static void GenerateSellProfitLoss()
