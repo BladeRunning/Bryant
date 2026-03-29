@@ -1,4 +1,4 @@
-﻿namespace ChiaTaxesV3.Form8949Generator
+﻿namespace ChiaTaxesV3.Form8949Generator.Models
 {
     public class Form8949Row
     {

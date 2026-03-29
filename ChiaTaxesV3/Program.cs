@@ -35,7 +35,8 @@ internal class Program
         var templatePath = "Form8949Generator/f8949.pdf";
 
         // generate 8949 pdf from csv
-        Form8949Generator.Create(isShortTerm, templatePath, outputPath, rows);
+        Form8949Generator form8949Generator = new Form8949Generator();
+        form8949Generator.Create(isShortTerm, templatePath, outputPath, rows);
     }
 
     private static void GenerateSellProfitLoss()

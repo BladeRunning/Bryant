@@ -2,12 +2,13 @@
 using PdfSharpCore.Drawing;
 using System.Globalization;
 using PdfSharpCore.Pdf;
+using ChiaTaxesV3.Form8949Generator.Models;
 
 namespace ChiaTaxesV3.Form8949Generator;
 
 public class Form8949Generator
 {
-    public static void Create(bool isShortTerm, string templatePath, string outputPath, List<Form8949Row> rows)
+    public void Create(bool isShortTerm, string templatePath, string outputPath, List<Form8949Row> rows)
     {
         var templateDoc = PdfReader.Open(templatePath, PdfDocumentOpenMode.Import);
         var page = isShortTerm ? 0 : 1;
@@ -41,10 +42,10 @@ public class Form8949Generator
                 // If this is NOT the first page, draw totals for the previous page
                 if (index > 0)
                 {
-                    gfx.DrawString(proceedsTotal.ToString("F2"), font, XBrushes.Black, new XPoint(280, 640 + yShortTermTotalOffset));
-                    gfx.DrawString(costBasisTotal.ToString("F2"), font, XBrushes.Black, new XPoint(345, 640 + yShortTermTotalOffset));
-                    gfx.DrawString(adjustmentTotal.ToString("F2"), font, XBrushes.Black, new XPoint(455, 640 + yShortTermTotalOffset));
-                    gfx.DrawString(gainOrLossTotal.ToString("F2"), font, XBrushes.Black, new XPoint(520, 640 + yShortTermTotalOffset));
+                    gfx.DrawString(FormatNegativeFromString(proceedsTotal.ToString("F2")), font, XBrushes.Black, new XPoint(280, 640 + yShortTermTotalOffset));
+                    gfx.DrawString(FormatNegativeFromString(costBasisTotal.ToString("F2")), font, XBrushes.Black, new XPoint(345, 640 + yShortTermTotalOffset));
+                    gfx.DrawString(FormatNegativeFromString(adjustmentTotal.ToString("F2")), font, XBrushes.Black, new XPoint(455, 640 + yShortTermTotalOffset));
+                    gfx.DrawString(FormatNegativeFromString(gainOrLossTotal.ToString("F2")), font, XBrushes.Black, new XPoint(520, 640 + yShortTermTotalOffset));
                 }
 
                 // Reset totals for the new page
@@ -78,16 +79,16 @@ public class Form8949Generator
             var roundedGainLoss = row.GainOrLoss.ToString("F2", CultureInfo.InvariantCulture);
 
             // Draw rounded values for row
-            gfx.DrawString(roundedProceeds, font, XBrushes.Black, new XPoint(280, y));
-            gfx.DrawString(roundedCostBasis, font, XBrushes.Black, new XPoint(345, y));
+            gfx.DrawString(FormatNegativeFromString(roundedProceeds), font, XBrushes.Black, new XPoint(280, y));
+            gfx.DrawString(FormatNegativeFromString(roundedCostBasis), font, XBrushes.Black, new XPoint(345, y));
 
             if (roundedAdjustment != null)
             {
-                gfx.DrawString(roundedAdjustment, font, XBrushes.Black, new XPoint(455, y));
+                gfx.DrawString(FormatNegativeFromString(roundedAdjustment), font, XBrushes.Black, new XPoint(455, y));
                 adjustmentTotal += decimal.Parse(roundedAdjustment, CultureInfo.InvariantCulture);
             }
 
-            gfx.DrawString(roundedGainLoss, font, XBrushes.Black, new XPoint(520, y));
+            gfx.DrawString(FormatNegativeFromString(roundedGainLoss), font, XBrushes.Black, new XPoint(520, y));
 
             // Add to totals
             proceedsTotal += decimal.Parse(roundedProceeds, CultureInfo.InvariantCulture);
@@ -98,11 +99,18 @@ public class Form8949Generator
         }
 
         // Draw totals for the final page
-        gfx.DrawString(proceedsTotal.ToString("F2"), font, XBrushes.Black, new XPoint(280, 640 + yShortTermTotalOffset));
-        gfx.DrawString(costBasisTotal.ToString("F2"), font, XBrushes.Black, new XPoint(345, 640 + yShortTermTotalOffset));
-        gfx.DrawString(adjustmentTotal.ToString("F2"), font, XBrushes.Black, new XPoint(455, 640 + yShortTermTotalOffset));
-        gfx.DrawString(gainOrLossTotal.ToString("F2"), font, XBrushes.Black, new XPoint(520, 640 + yShortTermTotalOffset));
+        gfx.DrawString(FormatNegativeFromString(proceedsTotal.ToString("F2")), font, XBrushes.Black, new XPoint(280, 640 + yShortTermTotalOffset));
+        gfx.DrawString(FormatNegativeFromString(costBasisTotal.ToString("F2")), font, XBrushes.Black, new XPoint(345, 640 + yShortTermTotalOffset));
+        gfx.DrawString(FormatNegativeFromString(adjustmentTotal.ToString("F2")), font, XBrushes.Black, new XPoint(455, 640 + yShortTermTotalOffset));
+        gfx.DrawString(FormatNegativeFromString(gainOrLossTotal.ToString("F2")), font, XBrushes.Black, new XPoint(520, 640 + yShortTermTotalOffset));
 
         outputDoc.Save(outputPath);
+    }
+
+    string FormatNegativeFromString(string s)
+    {
+        if (s.StartsWith("-", StringComparison.Ordinal))
+            return "(" + s.Substring(1) + ")";
+        return s;
     }
 }

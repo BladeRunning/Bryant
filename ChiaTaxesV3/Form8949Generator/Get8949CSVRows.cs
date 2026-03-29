@@ -1,4 +1,5 @@
-﻿using CsvHelper;
+﻿using ChiaTaxesV3.Form8949Generator.Models;
+using CsvHelper;
 using CsvHelper.Configuration;
 using System.Globalization;
 using System.Text;
